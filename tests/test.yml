@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  roles:
+    - pyslackers.python
+    - ansible-role-paperless
+    - pyslackers.nginx
+  vars:
+    paperless_user: admin
+    paperless_password: password
+    paperless_email: paperless@example.com
+    paperless_encrypt_passphrase: passphrase
+    paperless_secret_key: supersecretkey
+
+    # pyslackers.python
+    virtualenvs:
+      paperless:
+        path: /opt/paperless/.env
+        version: 3.6.3
+
+    # pyslackers.nginx
+    nginx_sites:
+      paperless:
+        directory: /opt/paperless
+        locations:
+          static:
+            location: /static
+            custom: |
+              autoindex on;
+              alias /opt/paperless/static;
+          root:
+            location: /
+            proxy_pass: http://127.0.0.1:8000

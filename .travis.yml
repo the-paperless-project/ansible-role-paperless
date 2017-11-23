@@ -1,0 +1,28 @@
+---
+language: python
+python: "3.6"
+matrix:
+  fast_finish: true
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq python-apt
+  - sudo apt-get install systemd-services
+install:
+  - pip install ansible ansible-lint
+  - pip --version
+  - python --version
+  - ansible --version
+  - "printf '[defaults]\nroles_path = ../' > ansible.cfg"
+  - git clone https://github.com/pyslackers/ansible-role-python ../pyslackers.python
+  - git clone https://github.com/pyslackers/ansible-role-nginx ../pyslackers.nginx
+script:
+  - ansible-lint tasks/main.yml
+  - ansible-playbook -i tests/inventory --syntax-check --list-tasks tests/test.yml
+  - ansible-playbook -i tests/inventory --connection=local --become -vvvv tests/test.yml -u root --skip-tags travis-exempt
+  - >
+    ansible-playbook -i tests/inventory --connection=local --become -vvvv tests/test.yml -u root --skip-tags travis-exempt
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
+  - cd /opt/paperless/source/src && /opt/paperless/.env/bin/gunicorn paperless.wsgi -w 2 --daemon
+  - curl localhost:80 -v

@@ -1,0 +1,22 @@
+---
+
+paperless_base_packages:
+  - tesseract-ocr
+  - imagemagick
+  - unpaper
+  - gnupg
+  - expect
+
+paperless_custom_packages:
+  - tesseract-ocr-fra
+
+paperless_consumption_dir: /opt/paperless/consumption
+paperless_virtualenv: /opt/paperless/.env
+
+paperless_git_url: https://github.com/danielquinn/paperless.git
+paperless_version: master
+paperless_ocr_language: eng
+paperless_tz: Etc/UTC
+paperless_list_per_page: 100
+paperless_allowed_host:
+  - 127.0.0.1

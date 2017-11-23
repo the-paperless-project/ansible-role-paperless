@@ -1,0 +1,126 @@
+---
+
+- name: Base packages
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  with_items: "{{ paperless_base_packages }}"
+
+- name: Custom packages
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  with_items: "{{ paperless_custom_packages }}"
+
+- name: Paperless group
+  group:
+    name: paperless
+
+- name: Paperless user
+  user:
+    name: paperless
+    createhome: False
+    group: paperless
+
+- name: Directories
+  file:
+    state: directory
+    path: "{{ item }}"
+    mode: 0755
+    owner: paperless
+  with_items:
+    - /opt/paperless/database
+    - /opt/paperless/documents
+    - /opt/paperless/static
+
+- name: Consumption directory
+  file:
+    group: paperless
+    state: directory
+    path: "{{ paperless_consumption_dir }}"
+
+- name: Clone
+  git:
+    repo: "{{ paperless_git_url }}"
+    dest: /opt/paperless/source
+    force: true
+    version: "{{ paperless_version }}"
+  register: paperless_source
+  notify: Restart Paperless
+
+- name: Python Requirements
+  pip:
+    requirements: /opt/paperless/source/requirements.txt
+    virtualenv: "{{ paperless_virtualenv }}"
+
+- name: Gunicorn
+  pip:
+    name: gunicorn
+    virtualenv: "{{ paperless_virtualenv }}"
+
+- name: Configure
+  template:
+    src: etc/paperless.conf
+    dest: /etc/paperless.conf
+  notify: Restart Paperless
+
+- name: Migrate Database
+  django_manage:
+    command: migrate
+    app_path: /opt/paperless/source/src
+    virtualenv: "{{ paperless_virtualenv }}"
+
+- name: Check Admin
+  shell: echo "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(username='{{ paperless_user }}').count()>0)" | {{ paperless_virtualenv }}/bin/python /opt/paperless/source/src/manage.py shell
+  changed_when: "'False' in admin_exist.stdout"
+  register: admin_exist
+
+- name: Create Admin
+  django_manage:
+    command: "createsuperuser --noinput --username={{ paperless_user }} --email={{ paperless_email }}"
+    app_path: /opt/paperless/source/src
+    virtualenv: "{{ paperless_virtualenv }}"
+  when: admin_exist|changed
+
+- name: Admin Password
+  template:
+    src: opt/paperless/admin_password.sh
+    dest: /opt/paperless/admin_password.sh
+    mode: 0700
+  when: admin_exist|changed
+
+- name: Change password
+  command: /opt/paperless/admin_password.sh
+  when: admin_exist|changed
+
+- name: Collect Static
+  django_manage:
+    command: collectstatic --noinput
+    app_path: /opt/paperless/source/src
+    virtualenv: "{{ paperless_virtualenv }}"
+  when: paperless_source|changed
+
+- name: Systemd directory
+  file:
+    path: /etc/systemd/system
+    state: directory
+
+- name: Systemd
+  template:
+    src: "etc/systemd/system/{{ item }}.service"
+    dest: "/etc/systemd/system/{{ item }}.service"
+  with_items:
+    - paperless-web
+    - paperless-consumer
+  notify: Restart Paperless
+
+- name: Systemd Enabled
+  tags:
+    - travis-exempt
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  with_items:
+    - paperless-web
+    - paperless-consumer

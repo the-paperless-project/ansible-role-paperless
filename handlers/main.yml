@@ -1,0 +1,11 @@
+---
+
+- name: Restart Paperless
+  service:
+    name: "{{ item }}"
+    state: restarted
+    daemon-reload: true
+  with_items:
+    - paperless-web
+    - paperless-consumer
+  when: "'travis' not in group_names"
