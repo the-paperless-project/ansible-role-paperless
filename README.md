@@ -29,11 +29,21 @@ $ git submodule add -b master https://github.com/ovv/ansible-role-paperless.git 
 Role Variables
 --------------
 
+* `paperless_user`: Paperless admin user.
+* `paperless_email`: Paperless admin email.
+* `paperless_password`: Paperless admin password.
+* `paperless_encrypt_passphrase`: Paperless encryption passphrase.
+* `paperless_secret_key`: Paperless secret key.
 
-Dependencies
-------------
+* `paperless_allowed_host`: List of hosts allowed to connect (default to `[127.0.0.1]`).
+* `paperless_ocr_language`: Default ocr language (default to `eng`).
+* `paperless_tz`: Timezone (default to `Etc/UTC`).
+* `paperless_list_per_page`: Number of item per page (default to `100`).
+* `paperless_consumption_dir`: Consumption directory for paperless (default to `/opt/paperless/consumption`).
+* `paperless_custom_packages`: Custom packages to install, like some tesseract languages (default to `[]`).
 
-None
+Some other variable and their defaults are located in [defaults](defaults/main.yml).
+
 
 Example Playbook
 ----------------
@@ -47,18 +57,18 @@ Example Playbook
     - ovv.paperless
     - pyslackers.nginx
   vars:
-    paperless_user: 
-    paperless_password: 
-    paperless_email:
-    paperless_encrypt_passphrase:
-    paperless_secret_key:
-    
+    paperless_user: admin
+    paperless_password: password
+    paperless_email: paperless@example.com
+    paperless_encrypt_passphrase: passphrase
+    paperless_secret_key: supersecretkey
+
     # pyslackers.python
     virtualenvs:
       paperless:
         path: /opt/paperless/.env
         version: 3.6.3
-    
+
     # pyslackers.nginx
     nginx_sites:
       paperless:
@@ -78,8 +88,3 @@ License
 -------
 
 MIT
-
-Author Information
-------------------
-
-None
