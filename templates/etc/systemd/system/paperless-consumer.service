@@ -4,6 +4,7 @@ Description=Paperless Consumer Daemon
 [Service]
 User=paperless
 Group=paperless
+WorkingDirectory=/opt/paperless
 ExecStart={{ paperless_virtualenv }}/bin/python /opt/paperless/source/src/manage.py document_consumer
 
 [Install]

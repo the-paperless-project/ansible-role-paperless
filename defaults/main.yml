@@ -20,3 +20,6 @@ paperless_tz: Etc/UTC
 paperless_list_per_page: 100
 paperless_allowed_host:
   - 127.0.0.1
+
+paperless_backup: False
+paperless_restore: False

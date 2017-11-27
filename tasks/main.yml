@@ -19,7 +19,7 @@
 - name: Paperless user
   user:
     name: paperless
-    createhome: False
+    createhome: True
     group: paperless
 
 - name: Directories
@@ -28,7 +28,10 @@
     path: "{{ item }}"
     mode: 0755
     owner: paperless
+    group: paperless
   with_items:
+    - /opt/paperless
+    - /opt/paperless/export
     - /opt/paperless/database
     - /opt/paperless/documents
     - /opt/paperless/static
@@ -40,6 +43,8 @@
     path: "{{ paperless_consumption_dir }}"
 
 - name: Clone
+  become: true
+  become_user: paperless
   git:
     repo: "{{ paperless_git_url }}"
     dest: /opt/paperless/source
@@ -65,6 +70,8 @@
   notify: Restart Paperless
 
 - name: Migrate Database
+  become: true
+  become_user: paperless
   django_manage:
     command: migrate
     app_path: /opt/paperless/source/src
@@ -94,6 +101,8 @@
   when: admin_exist|changed
 
 - name: Collect Static
+  become: true
+  become_user: paperless
   django_manage:
     command: collectstatic --noinput
     app_path: /opt/paperless/source/src
@@ -124,3 +133,37 @@
   with_items:
     - paperless-web
     - paperless-consumer
+
+- name: Export documents
+  django_manage:
+    command: "document_exporter /opt/paperless/export"
+    app_path: /opt/paperless/source/src
+    virtualenv: "{{ paperless_virtualenv }}"
+  register: paperless_docs_export
+  changed_when: paperless_docs_export.out != ""
+  when: paperless_backup
+
+- name: Fetch export
+  synchronize:
+    mode: pull
+    src: /opt/paperless/export/
+    dest: "{{ paperless_backup_directory }}"
+    recursive: yes
+  when: paperless_backup
+
+- name: Upload documents
+  synchronize:
+    mode: push
+    src: "{{ paperless_backup_directory }}"
+    dest: /opt/paperless/export
+    recursive: yes
+  when: paperless_restore
+
+- name: Import documents
+  django_manage:
+    command: "document_importer /opt/paperless/export"
+    app_path: /opt/paperless/source/src
+    virtualenv: "{{ paperless_virtualenv }}"
+  register: paperless_docs_import
+  changed_when: "paperless_docs_import.out is defined and 'Installed 0 object' not in paperless_docs_import.out"
+  when: paperless_restore
