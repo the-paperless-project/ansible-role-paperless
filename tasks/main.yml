@@ -15,6 +15,19 @@
 - name: Paperless group
   group:
     name: paperless
+    state: present
+
+- name: paperless incoming group
+  group:
+    name: "{{ paperless_consumption_dir_group }}"
+    state: present
+
+- name: "{{ paperless_consumption_dir_group }} group users"
+  user:
+    name: "{{ item }}"
+    groups: "{{ paperless_consumption_dir_group }}"
+    append: yes
+  with_items: "{{ paperless_consumption_dir_users }}"
 
 - name: Paperless user
   user:
@@ -38,8 +51,10 @@
 
 - name: Consumption directory
   file:
-    group: paperless
+    owner: paperless
+    group: "{{ paperless_consumption_dir_group }}"
     state: directory
+    mode: 0770
     path: "{{ paperless_consumption_dir }}"
 
 - name: Clone

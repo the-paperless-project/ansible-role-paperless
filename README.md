@@ -40,6 +40,8 @@ Role Variables
 * `paperless_tz`: Timezone (default to `Etc/UTC`).
 * `paperless_list_per_page`: Number of item per page (default to `100`).
 * `paperless_consumption_dir`: Consumption directory for paperless (default to `/opt/paperless/consumption`).
+* `paperless_consumption_dir_group`: Group of the consumption directory (default to `paper_inc`).
+* `paperless_consumption_dir_users`: List of users to add to the `paperless_consumption_dir_group` (default to `[]`).
 * `paperless_custom_packages`: Custom packages to install, like some tesseract languages (default to `[]`).
 
 Some other variable and their defaults are located in [defaults](defaults/main.yml).
