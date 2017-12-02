@@ -1,6 +1,7 @@
 ---
 
 paperless_base_packages:
+  - libmagic-dev
   - tesseract-ocr
   - imagemagick
   - unpaper

@@ -1,28 +1,33 @@
 ---
-language: python
-python: "3.6"
-matrix:
-  fast_finish: true
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq python-apt
-  - sudo apt-get install systemd-services
+services: docker
+
+env:
+  - distro=debian8
+  - distro=debian9
+  - distro=ubuntu1604
+
 install:
-  - pip install ansible ansible-lint
-  - pip --version
-  - python --version
-  - ansible --version
+  - export container_id=$(date +%s)
+  - idempotence=$(mktemp)
   - "printf '[defaults]\nroles_path = ../' > ansible.cfg"
+
+  # Build and run docker container
+  - docker pull geerlingguy/docker-$distro-ansible:latest
+  - docker run --detach --volume="$(dirname "$TRAVIS_BUILD_DIR")":/etc/ansible/roles:rw --name $container_id --privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro geerlingguy/docker-$distro-ansible:latest /lib/systemd/systemd
+  - docker exec --tty ${container_id} env TERM=xterm apt-get update -qq
+  - docker ps
+
+  # Requirements
   - git clone https://github.com/pyslackers/ansible-role-python ../pyslackers.python
   - git clone https://github.com/pyslackers/ansible-role-nginx ../pyslackers.nginx
+
 script:
-  - ansible-lint tasks/main.yml
-  - ansible-playbook -i tests/inventory --syntax-check --list-tasks tests/test.yml
-  - ansible-playbook -i tests/inventory --connection=local --become -vvvv tests/test.yml -u root --skip-tags travis-exempt
-  - >
-    ansible-playbook -i tests/inventory --connection=local --become -vvvv tests/test.yml -u root --skip-tags travis-exempt
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: pass' && exit 0)
-    || (echo 'Idempotence test: fail' && exit 1)
-  - cd /opt/paperless/source/src && /opt/paperless/.env/bin/gunicorn paperless.wsgi -w 2 --daemon
-  - curl localhost:80 -v
+  # Run playbook.
+  - docker exec --tty $container_id env TERM=xterm ansible-playbook /etc/ansible/roles/ansible-role-paperless/tests/test.yml --syntax-check
+  - docker exec $container_id env TERM=xterm env ANSIBLE_FORCE_COLOR=1 ansible-playbook /etc/ansible/roles/ansible-role-paperless/tests/test.yml -vvv
+  - docker exec $container_id ansible-playbook /etc/ansible/roles/ansible-role-paperless/tests/test.yml | tee -a $idempotence
+  - tail $idempotence | grep -q 'changed=0.*failed=0' && (printf 'Idempotence test pass') || (printf 'Idempotence test fail' && exit 1)
+
+  # Tests
+  - docker exec --tty ${container_id} env TERM=xterm apt-get install -y curl
+  - docker exec --tty ${container_id} env TERM=xterm curl localhost:80 -v
