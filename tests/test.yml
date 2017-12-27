@@ -18,6 +18,7 @@
         version: 3.6.3
 
     # pyslackers.nginx
+    ufw_enabled: False  # UFW is not installed in test images
     nginx_sites:
       paperless:
         directory: /opt/paperless
