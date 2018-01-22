@@ -76,13 +76,11 @@ Example Playbook
       paperless:
         directory: /opt/paperless
         locations:
-          static:
-            location: /static
+          - location: /static
             custom: |
               autoindex on;
               alias /opt/paperless/static;
-          root:
-            location: /
+          - location: /
             proxy_pass: http://127.0.0.1:8000
 ```
 
