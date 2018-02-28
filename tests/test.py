@@ -1,6 +1,6 @@
 import requests
 
-with request.sessions() as session:
+with requests.sessions() as session:
     session.get(url)
     csrftoken = session.cookies['csrftoken']
     print(csrftoken)
