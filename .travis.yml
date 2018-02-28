@@ -29,5 +29,5 @@ script:
   - tail $idempotence | grep -q 'changed=0.*failed=0' && (printf 'Idempotence test pass') || (printf 'Idempotence test fail' && exit 1)
 
   # Tests
-  - apt install python3-requests
+  - sudo apt install python3-requests
   - python3 tests/test.py
