@@ -13,7 +13,7 @@ install:
 
   # Build and run docker container
   - docker pull geerlingguy/docker-$distro-ansible:latest
-  - docker run --detach --volume="$(dirname "$TRAVIS_BUILD_DIR")":/etc/ansible/roles:rw --name $container_id --privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro geerlingguy/docker-$distro-ansible:latest /lib/systemd/systemd
+  - docker run --detach --port 80:80 --volume="$(dirname "$TRAVIS_BUILD_DIR")":/etc/ansible/roles:rw --name $container_id --privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro geerlingguy/docker-$distro-ansible:latest /lib/systemd/systemd
   - docker exec --tty ${container_id} env TERM=xterm apt-get update -qq
   - docker ps
 
@@ -29,7 +29,9 @@ script:
   - tail $idempotence | grep -q 'changed=0.*failed=0' && (printf 'Idempotence test pass') || (printf 'Idempotence test fail' && exit 1)
 
   # Tests
-  - docker exec --tty ${container_id} env TERM=xterm apt-get install -y curl
-  - docker exec --tty ${container_id} env TERM=xterm curl localhost:80 -v
-  - docker exec --tty ${container_id} env TERM=xterm curl localhost:80/admin/ -v
-  - docker exec --tty ${container_id} env TERM=xterm curl localhost:80/admin/login/?next=/admin/ -v
+  - apt-get install -y curl
+  - curl localhost:80 -v
+  - localhost:80/admin/ -v
+  - localhost:80/admin/login/?next=/admin/ -v
+  - python --version
+  - python3 --version
