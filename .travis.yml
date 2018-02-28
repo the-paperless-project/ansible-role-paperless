@@ -29,8 +29,5 @@ script:
   - tail $idempotence | grep -q 'changed=0.*failed=0' && (printf 'Idempotence test pass') || (printf 'Idempotence test fail' && exit 1)
 
   # Tests
-  - curl localhost:80 -v
-  - curl localhost:80/admin/ -v
-  - curl localhost:80/admin/login/?next=/admin/ -v
-  - python --version
-  - python3 --version
+  - apt install python3-requests
+  - python3 tests/test.py
