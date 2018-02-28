@@ -31,3 +31,4 @@ script:
   # Tests
   - docker exec --tty ${container_id} env TERM=xterm apt-get install -y curl
   - docker exec --tty ${container_id} env TERM=xterm curl localhost:80 -v
+  - docker exec --tty ${container_id} env TERM=xterm curl localhost:80/admin -v
