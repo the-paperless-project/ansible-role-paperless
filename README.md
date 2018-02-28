@@ -41,7 +41,7 @@ Role Variables
 * `paperless_consumption_dir_users`: List of users to add to the `paperless_consumption_dir_group` (default to `[]`).
 
 
-* `paperless_allowed_host`: List of hosts allowed to connect (default to `[127.0.0.1]`).
+* `paperless_allowed_host`: List of hosts allowed to connect (default to `[127.0.0.1, localhost]`).
 * `paperless_ocr_language`: Default ocr language (default to `eng`).
 * `paperless_tz`: Timezone (default to `Etc/UTC`).
 * `paperless_list_per_page`: Number of item per page (default to `100`).
