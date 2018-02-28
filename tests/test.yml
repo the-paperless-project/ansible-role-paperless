@@ -6,7 +6,7 @@
     - pyslackers.nginx
   vars:
     paperless_admin_user: admin
-    paperless_admin_password: password
+    paperless_admin_password: Vf3FUN2ozH1ReDoK
     paperless_admin_email: paperless@example.com
     paperless_encrypt_passphrase: passphrase
     paperless_secret_key: supersecretkey

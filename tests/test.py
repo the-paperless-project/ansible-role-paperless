@@ -11,7 +11,7 @@ with requests.Session() as session:
         data={
             'csrfmiddlewaretoken': csrftoken,
             'next': '/admin/',
-            'password': 'password',
+            'password': 'Vf3FUN2ozH1ReDoK',
             'username': 'admin'
         },
         headers={
@@ -19,7 +19,6 @@ with requests.Session() as session:
         }
     )
 
-print(response)
-print(response.status_code)
-print(response.headers)
+
+assert response.status_code == 200
 print(response.text)
