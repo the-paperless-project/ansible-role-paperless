@@ -1,22 +1,20 @@
 import requests
 
 url = 'http://localhost:80'
-print(url)
-r = requests.get(url)
-print(r.status_code)
-print(r.headers)
-print(r.text)
+response = requests.get(url)
+csrftoken = response.headers['set-cookie'].split(';', 1)[0].split('=')[1]
+print(csrftoken)
 
-url = 'http://localhost:80/admin/'
-print(url)
-r = requests.get(url)
-print(r.status_code)
-print(r.headers)
-print(r.text)
+response = requests.post(
+    url,
+    data={
+        'csrfmiddlewaretoken': csrftoken,
+        'next': '/admin/',
+        'password': 'password',
+        'username': 'admin'
+    })
 
-url = 'http://localhost:80/admin/login/?next=/admin/'
-print(url)
-r = requests.get(url)
-print(r.status_code)
-print(r.headers)
-print(r.text)
+print(response)
+print(response.status_code)
+print(response.headers)
+print(response.text)
