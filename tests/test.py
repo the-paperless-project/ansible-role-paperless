@@ -12,6 +12,9 @@ response = requests.post(
         'next': '/admin/',
         'password': 'password',
         'username': 'admin'
+    },
+    headers={
+        'Referer': url
     })
 
 print(response)
