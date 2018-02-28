@@ -1,14 +1,22 @@
 import requests
 
-r = requests.get('http://localhost:80')
+url = 'http://localhost:80'
+print(url)
+r = requests.get(url)
 print(r.status_code)
-assert r.status_code == 301
+print(r.headers)
+print(r.text)
 
-r = requests.get('http://localhost:80/admin/')
+url = 'http://localhost:80/admin/'
+print(url)
+r = requests.get(url)
 print(r.status_code)
-assert r.status_code == 301
+print(r.headers)
+print(r.text)
 
-r = requests.get('http://localhost:80/admin/login/?next=/admin/')
-assert r.status_code == 200
+url = 'http://localhost:80/admin/login/?next=/admin/'
+print(url)
+r = requests.get(url)
+print(r.status_code)
 print(r.headers)
 print(r.text)
