@@ -17,23 +17,23 @@
     name: paperless
     state: present
 
-- name: paperless incoming group
-  group:
-    name: "{{ paperless_consumption_dir_group }}"
-    state: present
-
-- name: "{{ paperless_consumption_dir_group }} group users"
-  user:
-    name: "{{ item }}"
-    groups: "{{ paperless_consumption_dir_group }}"
-    append: yes
-  with_items: "{{ paperless_consumption_dir_users }}"
-
 - name: Paperless user
   user:
     name: paperless
     createhome: True
     group: paperless
+
+- name: paperless consumption group
+  group:
+    name: "{{ paperless_consumption_dir_group }}"
+    state: present
+
+- name: paperless consumption group users
+  user:
+    name: "{{ item }}"
+    groups: "{{ paperless_consumption_dir_group }}"
+    append: yes
+  with_items: "{{ paperless_consumption_dir_users }}"
 
 - name: Directories
   file:
@@ -92,30 +92,35 @@
     app_path: /opt/paperless/source/src
     virtualenv: "{{ paperless_virtualenv }}"
 
-- name: Check Admin
-  shell: echo "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(username='{{ paperless_user }}').count()>0)" | {{ paperless_virtualenv }}/bin/python /opt/paperless/source/src/manage.py shell
+- name: Check admin user exist
+  shell: echo "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(username='{{ paperless_admin_user }}').count()>0)" | {{ paperless_virtualenv }}/bin/python /opt/paperless/source/src/manage.py shell
   changed_when: "'False' in admin_exist.stdout"
   register: admin_exist
 
-- name: Create Admin
+- name: Create admin user
   django_manage:
-    command: "createsuperuser --noinput --username={{ paperless_user }} --email={{ paperless_email }}"
+    command: "createsuperuser --noinput --username={{ paperless_admin_user }} --email={{ paperless_admin_email }}"
     app_path: /opt/paperless/source/src
     virtualenv: "{{ paperless_virtualenv }}"
   when: admin_exist|changed
 
-- name: Admin Password
+- name: Copy admin user password script
   template:
     src: opt/paperless/admin_password.sh
     dest: /opt/paperless/admin_password.sh
     mode: 0700
   when: admin_exist|changed
 
-- name: Change password
+- name: Set admin user password
   command: /opt/paperless/admin_password.sh
   when: admin_exist|changed
 
-- name: Collect Static
+- name: Remove admin user password script
+  file:
+    path: /opt/paperless/admin_password.sh
+    state: absent
+
+- name: Collect static files
   become: true
   become_user: paperless
   django_manage:
@@ -124,12 +129,12 @@
     virtualenv: "{{ paperless_virtualenv }}"
   when: paperless_source|changed
 
-- name: Systemd directory
+- name: Create systemd directory
   file:
     path: /etc/systemd/system
     state: directory
 
-- name: Systemd
+- name: Configure systemd services
   template:
     src: "etc/systemd/system/{{ item }}.service"
     dest: "/etc/systemd/system/{{ item }}.service"
@@ -138,7 +143,7 @@
     - paperless-consumer
   notify: Restart Paperless
 
-- name: Systemd Enabled
+- name: Start & enable systemd services
   tags:
     - travis-exempt
   systemd:

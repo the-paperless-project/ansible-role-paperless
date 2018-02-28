@@ -5,9 +5,9 @@
     - ansible-role-paperless
     - pyslackers.nginx
   vars:
-    paperless_user: admin
-    paperless_password: password
-    paperless_email: paperless@example.com
+    paperless_admin_user: admin
+    paperless_admin_password: password
+    paperless_admin_email: paperless@example.com
     paperless_encrypt_passphrase: passphrase
     paperless_secret_key: supersecretkey
 
@@ -15,7 +15,7 @@
     virtualenvs:
       paperless:
         path: /opt/paperless/.env
-        version: 3.6.3
+        version: 3.6.4
 
     # pyslackers.nginx
     ufw_enabled: False  # UFW is not installed in test images

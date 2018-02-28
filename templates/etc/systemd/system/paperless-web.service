@@ -5,6 +5,8 @@ Description=Paperless Web Daemon
 User=paperless
 Group=paperless
 WorkingDirectory=/opt/paperless/source/src
+Environment="PAPERLESS_PASSPHRASE={{ paperless_encrypt_passphrase }}"
+Environment="PAPERLESS_SECRET_KEY={{ paperless_secret_key }}"
 ExecStart={{ paperless_virtualenv }}/bin/gunicorn paperless.wsgi -w 2
 
 [Install]
