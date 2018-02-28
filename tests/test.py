@@ -5,7 +5,6 @@ url = 'http://localhost/admin/login/?next=/admin/'
 with requests.Session() as session:
     session.get(url)
     csrftoken = session.cookies['csrftoken']
-    print(csrftoken)
     response = session.post(
         url,
         data={
@@ -20,5 +19,8 @@ with requests.Session() as session:
     )
 
 
-assert response.status_code == 200
+print(response.status_code)
 print(response.text)
+
+assert response.status_code == 200
+assert 'Paperless administration' in response.text
