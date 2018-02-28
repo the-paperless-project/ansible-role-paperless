@@ -11,7 +11,7 @@ with requests.Session() as session:
         data={
             'csrfmiddlewaretoken': csrftoken,
             'next': '/admin/',
-            'password': 'passwordQ',
+            'password': 'password',
             'username': 'admin'
         },
         headers={
