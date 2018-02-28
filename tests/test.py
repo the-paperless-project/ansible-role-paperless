@@ -1,6 +1,8 @@
 import requests
 
-with requests.sessions() as session:
+url = 'http://localhost/admin/login/?next=/admin/'
+
+with requests.Session() as session:
     session.get(url)
     csrftoken = session.cookies['csrftoken']
     print(csrftoken)
@@ -9,7 +11,7 @@ with requests.sessions() as session:
         data={
             'csrfmiddlewaretoken': csrftoken,
             'next': '/admin/',
-            'password': 'password',
+            'password': 'passwordQ',
             'username': 'admin'
         },
         headers={
