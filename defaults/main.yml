@@ -26,6 +26,7 @@ paperless_tz: Etc/UTC
 paperless_ocr_language: eng
 paperless_list_per_page: 100
 
+paperless_force_script_name: False
 paperless_allowed_host:
   - 127.0.0.1
   - localhost
