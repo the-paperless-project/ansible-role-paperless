@@ -102,18 +102,18 @@
     command: "createsuperuser --noinput --username={{ paperless_admin_user }} --email={{ paperless_admin_email }}"
     app_path: /opt/paperless/source/src
     virtualenv: "{{ paperless_virtualenv }}"
-  when: admin_exist|changed
+  when: admin_exist is changed
 
 - name: Copy admin user password script
   template:
     src: opt/paperless/admin_password.sh
     dest: /opt/paperless/admin_password.sh
     mode: 0700
-  when: admin_exist|changed
+  when: admin_exist is changed
 
 - name: Set admin user password
   command: /opt/paperless/admin_password.sh
-  when: admin_exist|changed
+  when: admin_exist is changed
 
 - name: Remove admin user password script
   file:
@@ -127,7 +127,7 @@
     command: collectstatic --noinput
     app_path: /opt/paperless/source/src
     virtualenv: "{{ paperless_virtualenv }}"
-  when: paperless_source|changed
+  when: paperless_source is changed
 
 - name: Create systemd directory
   file:
