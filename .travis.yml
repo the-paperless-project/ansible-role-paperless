@@ -1,10 +1,17 @@
 ---
 services: docker
 
+addons:
+  apt:
+    update: True
+    packages:
+      python3-requests
+
 env:
   - distro=debian8
   - distro=debian9
   - distro=ubuntu1604
+  - distro=ubuntu1804
 
 install:
   - export container_id=$(date +%s)
@@ -29,5 +36,4 @@ script:
   - tail $idempotence | grep -q 'changed=0.*failed=0' && (printf 'Idempotence test pass') || (printf 'Idempotence test fail' && exit 1)
 
   # Tests
-  - sudo apt install python3-requests
   - python3 tests/test.py
