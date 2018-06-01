@@ -38,6 +38,7 @@ Role Variables
 * `paperless_consumption_dir`: Consumption directory for paperless (default to `/opt/paperless/consumption`).
 * `paperless_consumption_dir_group`: Group of the consumption directory (default to `paperless`).
 * `paperless_consumption_dir_users`: List of users to add to the `paperless_consumption_dir_group` (default to `[]`).
+* `paperless_consumption_dir_mode`: Consumption directory mode (default to `0770`).
 
 * `paperless_list_per_page`: Number of item per page (default to `100`).
 * `paperless_tz`: Timezone (default to `Etc/UTC`).
