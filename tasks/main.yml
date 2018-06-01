@@ -54,7 +54,7 @@
     owner: paperless
     group: "{{ paperless_consumption_dir_group }}"
     state: directory
-    mode: 0770
+    mode: "{{ paperless_consumption_dir_mode }}"
     path: "{{ paperless_consumption_dir }}"
 
 - name: Clone
