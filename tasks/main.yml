@@ -91,6 +91,9 @@
     command: migrate
     app_path: /opt/paperless/source/src
     virtualenv: "{{ paperless_virtualenv }}"
+  environment:
+    PAPERLESS_PASSPHRASE: "{{ paperless_encrypt_passphrase }}"
+    PAPERLESS_SECRET_KEY: "{{ paperless_secret_key }}"
 
 - name: Check admin user exist
   shell: echo "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(username='{{ paperless_admin_user }}').count()>0)" | {{ paperless_virtualenv }}/bin/python /opt/paperless/source/src/manage.py shell
