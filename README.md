@@ -44,6 +44,8 @@ Role Variables
 * `paperless_tz`: Timezone (default to `Etc/UTC`).
 * `paperless_ocr_language`: Default ocr language (default to `eng`).
 * `paperless_force_script_name`: See paperless configuration file. (default to `False`).
+* `paperless_disable_login`: Disable user authentication (default to `False`).
+* `paperless_inline_doc`: Allow viewing document in browser (default to `False`).
 
 * `paperless_allowed_host`: List of hosts allowed to connect (default to `[127.0.0.1, localhost]`).
 * `paperless_custom_packages`: Custom packages to install, like some tesseract languages (default to `[]`).
