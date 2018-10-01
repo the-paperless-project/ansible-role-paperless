@@ -21,7 +21,7 @@ paperless_consumption_dir_users: []
 paperless_consumption_dir_mode: 0770
 
 paperless_git_url: https://github.com/danielquinn/paperless.git
-paperless_version: 2.2.1
+paperless_version: 2.3.0
 
 paperless_tz: Etc/UTC
 paperless_ocr_language: eng
@@ -34,3 +34,6 @@ paperless_allowed_host:
 
 paperless_backup: False
 paperless_restore: False
+
+paperless_disable_login: False
+paperless_inline_doc: False
