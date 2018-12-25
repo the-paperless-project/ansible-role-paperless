@@ -2,15 +2,13 @@
 
 - name: Base packages
   apt:
-    pkg: "{{ item }}"
+    pkg: "{{ paperless_base_packages }}"
     state: latest
-  with_items: "{{ paperless_base_packages }}"
 
 - name: Custom packages
   apt:
-    pkg: "{{ item }}"
+    pkg: "{{ paperless_custom_packages }}"
     state: latest
-  with_items: "{{ paperless_custom_packages }}"
 
 - name: Paperless group
   group:
