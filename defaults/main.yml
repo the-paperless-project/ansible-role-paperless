@@ -22,7 +22,7 @@ paperless_consumption_dir_users: []
 paperless_consumption_dir_mode: 0770
 
 paperless_git_url: https://github.com/danielquinn/paperless.git
-paperless_version: 2.6.0
+paperless_version: 2.7.0
 
 paperless_tz: Etc/UTC
 paperless_ocr_language: eng
