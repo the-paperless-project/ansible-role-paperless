@@ -3,12 +3,21 @@
 - name: Base packages
   apt:
     pkg: "{{ paperless_base_packages }}"
-    state: latest
+    state: present
 
 - name: Custom packages
   apt:
     pkg: "{{ paperless_custom_packages }}"
-    state: latest
+    state: present
+
+- name: "Install python2 requirements"
+  apt:
+    pkg:
+      - "python-virtualenv"
+      - "python-pip"
+      - "python-setuptools"
+    state: present
+  when: "ansible_python_version[0] == '2'"
 
 - name: Paperless group
   group:
@@ -18,7 +27,7 @@
 - name: Paperless user
   user:
     name: paperless
-    createhome: True
+    createhome: true
     group: paperless
 
 - name: paperless consumption group
@@ -30,7 +39,7 @@
   user:
     name: "{{ item }}"
     groups: "{{ paperless_consumption_dir_group }}"
-    append: yes
+    append: true
   with_items: "{{ paperless_consumption_dir_users }}"
 
 - name: Directories
@@ -70,11 +79,7 @@
   pip:
     requirements: /opt/paperless/source/requirements.txt
     virtualenv: "{{ paperless_virtualenv }}"
-
-- name: Gunicorn
-  pip:
-    name: gunicorn
-    virtualenv: "{{ paperless_virtualenv }}"
+    virtualenv_python: python3
 
 - name: Configure
   template:
@@ -145,8 +150,6 @@
   notify: Restart Paperless
 
 - name: Start & enable systemd services
-  tags:
-    - travis-exempt
   systemd:
     name: "{{ item }}"
     state: started
@@ -169,7 +172,7 @@
     mode: pull
     src: /opt/paperless/export/
     dest: "{{ paperless_backup_directory }}"
-    recursive: yes
+    recursive: true
   when: paperless_backup
 
 - name: Upload documents
@@ -177,7 +180,7 @@
     mode: push
     src: "{{ paperless_backup_directory }}"
     dest: /opt/paperless/export
-    recursive: yes
+    recursive: true
   when: paperless_restore
 
 - name: Import documents
