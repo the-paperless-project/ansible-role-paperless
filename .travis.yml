@@ -1,39 +1,14 @@
 ---
+language: python
 services: docker
 
-addons:
-  apt:
-    update: True
-    packages:
-      python3-requests
-
 env:
-  - distro=debian8
-  - distro=debian9
-  - distro=ubuntu1604
-  - distro=ubuntu1804
+  - MOLECULE_DISTRO: debian9
+  - MOLECULE_DISTRO: ubuntu1604
+  - MOLECULE_DISTRO: ubuntu1804
 
 install:
-  - export container_id=$(date +%s)
-  - idempotence=$(mktemp)
-  - "printf '[defaults]\nroles_path = ../' > ansible.cfg"
-
-  # Build and run docker container
-  - docker pull geerlingguy/docker-$distro-ansible:latest
-  - docker run --detach -p 80:80 --volume="$(dirname "$TRAVIS_BUILD_DIR")":/etc/ansible/roles:rw --name $container_id --privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro geerlingguy/docker-$distro-ansible:latest /lib/systemd/systemd
-  - docker exec --tty ${container_id} env TERM=xterm apt-get update -qq
-  - docker ps
-
-  # Requirements
-  - git clone https://github.com/pyslackers/ansible-role-python ../pyslackers.python
-  - git clone https://github.com/pyslackers/ansible-role-nginx ../pyslackers.nginx
+  - pip install molecule docker
 
 script:
-  # Run playbook.
-  - docker exec --tty $container_id env TERM=xterm ansible-playbook /etc/ansible/roles/ansible-role-paperless/tests/test.yml --syntax-check
-  - docker exec $container_id env TERM=xterm env ANSIBLE_FORCE_COLOR=1 ansible-playbook /etc/ansible/roles/ansible-role-paperless/tests/test.yml -vvv
-  - docker exec $container_id ansible-playbook /etc/ansible/roles/ansible-role-paperless/tests/test.yml | tee -a $idempotence
-  - tail $idempotence | grep -q 'changed=0.*failed=0' && (printf 'Idempotence test pass') || (printf 'Idempotence test fail' && exit 1)
-
-  # Tests
-  - python3 tests/test.py
+  - molecule test
