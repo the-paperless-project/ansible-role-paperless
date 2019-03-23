@@ -9,4 +9,4 @@
     paperless_secret_key: supersecretkey
     paperless_consumption_dir_group: paperless_consumption
   roles:
-    - role: ansible-role-paperless
+    - role: ovv.paperless
