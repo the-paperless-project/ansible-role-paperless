@@ -99,7 +99,12 @@
     PAPERLESS_SECRET_KEY: "{{ paperless_secret_key }}"
 
 - name: Check if admin user exist
-  shell: echo "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(username='{{ paperless_admin_user }}').count()>0)" | {{ paperless_virtualenv }}/bin/python /opt/paperless/source/src/manage.py shell
+  shell: >
+      set -o pipefail
+      echo "from django.contrib.auth import get_user_model;
+      User = get_user_model();
+      print(User.objects.filter(username='{{ paperless_admin_user }}').count()>0)" |
+      {{ paperless_virtualenv }}/bin/python /opt/paperless/source/src/manage.py shell
   changed_when: "'False' in admin_exist.stdout"
   register: admin_exist
 
@@ -164,7 +169,7 @@
     app_path: /opt/paperless/source/src
     virtualenv: "{{ paperless_virtualenv }}"
   register: paperless_docs_export
-  changed_when: paperless_docs_export.out != ""
+  changed_when: not paperless_docs_export.out
   when: paperless_backup
 
 - name: Fetch export

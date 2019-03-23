@@ -8,6 +8,7 @@ env:
   - MOLECULE_DISTRO: ubuntu1804
 
 install:
+  - mv ../ansible-role-paperless ../ovv.paperless
   - pip install molecule docker
 
 script:
