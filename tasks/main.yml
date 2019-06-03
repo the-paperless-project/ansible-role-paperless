@@ -170,7 +170,7 @@
     virtualenv: "{{ paperless_virtualenv }}"
   register: paperless_docs_export
   changed_when: not paperless_docs_export.out
-  when: paperless_backup
+  when: paperless_backup | bool
 
 - name: Fetch export
   synchronize:
@@ -178,7 +178,7 @@
     src: /opt/paperless/export/
     dest: "{{ paperless_backup_directory }}"
     recursive: true
-  when: paperless_backup
+  when: paperless_backup | bool
 
 - name: Upload documents
   synchronize:
@@ -186,7 +186,7 @@
     src: "{{ paperless_backup_directory }}"
     dest: /opt/paperless/export
     recursive: true
-  when: paperless_restore
+  when: paperless_restore | bool
 
 - name: Import documents
   django_manage:
@@ -195,4 +195,4 @@
     virtualenv: "{{ paperless_virtualenv }}"
   register: paperless_docs_import
   changed_when: "paperless_docs_import.out is defined and 'Installed 0 object' not in paperless_docs_import.out"
-  when: paperless_restore
+  when: paperless_restore | bool
